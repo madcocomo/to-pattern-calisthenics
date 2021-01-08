@@ -16,7 +16,7 @@ public class AppliedJobApplications {
 
     public void add(Employer employer, Job job, LocalDate applicationTime, JobSeeker jobSeeker) {
         JobApplications saved = jobApplications.getOrDefault(jobSeeker, new JobApplications());
-        saved.add(employer, job, applicationTime);
+        saved.add(employer, job, jobSeeker, applicationTime);
         jobApplications.put(jobSeeker, saved);
     }
 
@@ -34,8 +34,9 @@ public class AppliedJobApplications {
     }
 
     public int getCount(String jobName, Employer employer) {
+        Predicate<JobApplication> predicate = JobApplication.getPredicate(jobName, employer);
         return (int) jobApplications.entrySet().stream()
-                .filter(set -> set.getValue().isMatched(jobName, employer))
+                .filter(set -> set.getValue().isMatched(predicate))
                 .count();
     }
 

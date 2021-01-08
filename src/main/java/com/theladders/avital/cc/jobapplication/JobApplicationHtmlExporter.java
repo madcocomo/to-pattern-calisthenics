@@ -18,17 +18,17 @@ public class JobApplicationHtmlExporter implements JobApplicationExporter {
             + "<tbody>";
     static final String HTML_END = "</tbody>" + "</table>" + "</body>" + "</html>";
 
-    private String concatTableRow(String content, JobSeeker jobSeeker, List<JobApplication> appliedOnDate) {
+    private String concatTableRow(String content, List<JobApplication> appliedOnDate) {
         for (JobApplication application : appliedOnDate) {
-            content = content.concat(toTableRow(application, jobSeeker));
+            content = content.concat(toTableRow(application));
         }
         return content;
     }
 
-    String toTableRow(JobApplication application, JobSeeker jobSeeker) {
-        return "<tr>" + application.publishedJob.toTableCells() +
-                "<td>" + jobSeeker + "</td>" +
-                "<td>" + application.applicationTime.format(JobApplication.DATE_TIME_FORMATTER) + "</td>" +
+    String toTableRow(JobApplication application) {
+        return "<tr>" +
+                application.publishedJob.toTableCells() +
+                application.applicantInfo.toTableCells() +
                 "</tr>";
     }
 
@@ -36,9 +36,8 @@ public class JobApplicationHtmlExporter implements JobApplicationExporter {
     public String export(LocalDate date, Set<Map.Entry<JobSeeker, JobApplications>> entries) {
         String content = "";
         for (Map.Entry<JobSeeker, JobApplications> set : entries) {
-            JobSeeker applicant = set.getKey();
             List<JobApplication> appliedOnDate = set.getValue().getMatchedItems(date);
-            content = concatTableRow(content, applicant, appliedOnDate);
+            content = concatTableRow(content, appliedOnDate);
         }
         return HTML_HEADER + content + HTML_END;
     }

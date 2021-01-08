@@ -2,6 +2,7 @@ package com.theladders.avital.cc.jobapplication;
 
 import com.theladders.avital.cc.employer.Employer;
 import com.theladders.avital.cc.job.Job;
+import com.theladders.avital.cc.jobseeker.JobSeeker;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,20 +13,14 @@ import java.util.stream.Collectors;
 public class JobApplications {
     final List<JobApplication> jobApplications = new ArrayList<>();
 
-    void add(Employer employer, Job job, LocalDate applicationTime) {
-        jobApplications.add(new JobApplication(job, applicationTime, employer));
+    void add(Employer employer, Job job, JobSeeker jobSeeker, LocalDate applicationTime) {
+        jobApplications.add(new JobApplication(job, applicationTime, employer, jobSeeker));
     }
 
     int getCount(String jobName, Employer employer) {
         Predicate<JobApplication> predicate =
                 JobApplication.getPredicate(jobName, employer);
         return (int) jobApplications.stream().filter(predicate).count();
-    }
-
-    public boolean isMatched(String jobName, Employer employer) {
-        Predicate<JobApplication> predicate =
-                JobApplication.getPredicate(jobName, employer);
-        return jobApplications.stream().anyMatch(predicate);
     }
 
     public boolean isMatched(Predicate<JobApplication> listPredicate) {

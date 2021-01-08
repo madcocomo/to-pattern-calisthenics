@@ -23,8 +23,8 @@ import static org.junit.Assert.assertThat;
 public class ApplicationTest {
     Application application;
 
-    private JobApplication createNewJobApplication(String jobName, String jobType, String employerName, String applicationTime) {
-        return new JobApplication(new Job(jobName, JobType.valueOf(jobType)), LocalDate.parse(applicationTime), new Employer(employerName));
+    private JobApplication createNewJobApplication(String jobName, String jobType, String employerName, String applicationTime, String jobSeekerName) {
+        return new JobApplication(new Job(jobName, JobType.valueOf(jobType)), LocalDate.parse(applicationTime), new Employer(employerName), new JobSeeker(jobSeekerName));
     }
 
     private Job createNewJob(final String jobName, final JobType jobType) {
@@ -124,8 +124,8 @@ public class ApplicationTest {
         application.applyJob(new Employer(employerAlibaba), new Job(seniorJavaDevJob, JobType.ATS), LocalDate.parse("2020-01-01"), jobSeeker, createResumeBelongNobody());
         List<JobApplication> appliedJobs = application.getJobApplications(jobSeeker);
         List<JobApplication> expected = new ArrayList<JobApplication>() {{
-            add(createNewJobApplication("Java开发", "ATS", "Alibaba", "2020-01-01"));
-            add(createNewJobApplication("高级Java开发", "ATS", "Alibaba", "2020-01-01"));
+            add(createNewJobApplication("Java开发", "ATS", "Alibaba", "2020-01-01", jobSeekerName));
+            add(createNewJobApplication("高级Java开发", "ATS", "Alibaba", "2020-01-01", jobSeekerName));
         }};
 
         assertThat(appliedJobs, is(expected));

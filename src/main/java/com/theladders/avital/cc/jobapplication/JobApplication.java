@@ -1,22 +1,23 @@
 package com.theladders.avital.cc.jobapplication;
 
-import com.google.common.base.Objects;
 import com.theladders.avital.cc.employer.Employer;
 import com.theladders.avital.cc.job.Job;
 import com.theladders.avital.cc.job.PublishedJob;
+import com.theladders.avital.cc.jobseeker.JobSeeker;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public class JobApplication {
     static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    final LocalDate applicationTime;
+    final ApplicantInfo applicantInfo;
     final PublishedJob publishedJob;
 
-    public JobApplication(Job job, LocalDate applicationTime, Employer employer) {
+    public JobApplication(Job job, LocalDate applicationTime, Employer employer, JobSeeker applicant) {
+        applicantInfo = new ApplicantInfo(applicationTime, applicant);
         this.publishedJob = new PublishedJob(job, employer);
-        this.applicationTime = applicationTime;
     }
 
     static Predicate<JobApplication> getPredicate(String jobName, Employer employer) {
@@ -24,7 +25,7 @@ public class JobApplication {
     }
 
     public static Predicate<JobApplication> getPredicate(LocalDate date) {
-        return jobApplication -> jobApplication.applicationTime.equals(date);
+        return application -> application.applicantInfo.isMatched(date);
     }
 
     static Predicate<JobApplication> getPredicate(String jobName, LocalDate from, LocalDate to) {
@@ -33,10 +34,10 @@ public class JobApplication {
             predicate = predicate.and(application -> application.publishedJob.isMatched(jobName));
         }
         if (from != null) {
-            predicate = predicate.and(application -> !from.isAfter(application.applicationTime));
+            predicate = predicate.and(application -> application.applicantInfo.isAfterOrSame(from));
         }
         if (to != null) {
-            predicate = predicate.and(application -> !to.isBefore(application.applicationTime));
+            predicate = predicate.and(application -> application.applicantInfo.isBeforeOrSame(to));
         }
         return predicate;
     }
@@ -46,12 +47,12 @@ public class JobApplication {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         JobApplication that = (JobApplication) o;
-        return Objects.equal(applicationTime, that.applicationTime) &&
-                Objects.equal(publishedJob, that.publishedJob);
+        return Objects.equals(applicantInfo, that.applicantInfo) && Objects.equals(publishedJob, that.publishedJob);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(applicationTime, publishedJob);
+        return Objects.hash(applicantInfo, publishedJob);
     }
+
 }
